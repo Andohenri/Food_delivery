@@ -3,7 +3,7 @@ import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import "./global.css";
 
-export default function RootLayout() {
+export default function TabsLayout() {
   const [fontLoaded, error] = useFonts({
     "Quicksand-Bold": require('../assets/fonts/Quicksand-Bold.ttf'),
     "Quicksand-Medium": require('../assets/fonts/Quicksand-Medium.ttf'),
@@ -13,9 +13,9 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if(error) throw error;
-    if(fontLoaded) SplashScreen.hideAsync();
+    if (error) throw error;
+    if (fontLoaded) SplashScreen.hideAsync();
   }, [fontLoaded, error])
-  
-  return <Stack screenOptions={{headerShown: false}} />;
+
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
