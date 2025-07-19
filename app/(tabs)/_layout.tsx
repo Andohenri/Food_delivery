@@ -13,13 +13,9 @@ const TabBarIcon = ({ focused, icon, title }: TabBarIconProps) => {
 }
 
 const TabsLayout = () => {
-  const { isAuthenticated, fetchAuthenticatedUser } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
-  // useEffect(() => {
-  //   fetchAuthenticatedUser();
-  // }, [])
-
-  if (isAuthenticated) return <Redirect href={"/sign-in"} />
+  if (!isAuthenticated) return <Redirect href={"/sign-in"} />
 
   return <Tabs
     screenOptions={{

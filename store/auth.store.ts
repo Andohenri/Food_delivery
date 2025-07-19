@@ -1,6 +1,8 @@
 import { getCurrentUser } from '@/lib/appwrite';
 import { User } from '@/type';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 type AuthStore = {
    isAuthenticated: boolean;
@@ -14,31 +16,44 @@ type AuthStore = {
    fetchAuthenticatedUser: () => Promise<void>;
 }
 
-const useAuthStore = create<AuthStore>((set) => ({
-   isAuthenticated: false,
-   user: null,
-   isLoading: true,
+const useAuthStore = create<AuthStore>()(
+   persist(
+      (set) => ({
+         isAuthenticated: false,
+         user: null,
+         isLoading: false,
 
-   setIsAuthenticated: (value) => set({ isAuthenticated: value }),
-   setUser: (value) => set({ user: value }),
-   setIsLoading: (value) => set({ isLoading: value }),
+         setIsAuthenticated: (value) => set({ isAuthenticated: value }),
+         setUser: (value) => set({ user: value }),
+         setIsLoading: (value) => set({ isLoading: value }),
 
-   fetchAuthenticatedUser: async () => {
-      set({ isLoading: true });
-      try {
-         const user = await getCurrentUser();
-         console.log(user);
-         
-         if (user) set({ isAuthenticated: true, user: user as User })
-         else set({ isAuthenticated: false, user: null });
-      } catch (error) {
-         console.log("Fetch authenticatedUser error", error);
-         
-         set({ isAuthenticated: false, user: null });
-      } finally {
-         set({ isLoading: false });
+         fetchAuthenticatedUser: async () => {
+            set({ isLoading: true });
+            try {
+               const user = await getCurrentUser();
+               if (user) set({ isAuthenticated: true, user: user as User });
+               else set({ isAuthenticated: false, user: null });
+            } catch (error) {
+               console.log("Fetch authenticatedUser error", error);
+               set({ isAuthenticated: false, user: null });
+            } finally {
+               set({ isLoading: false });
+            }
+         }
+      }),
+      {
+         name: 'auth',
+         storage: createJSONStorage(() => AsyncStorage),
+         partialize: (state) => ({ isAuthenticated: state.isAuthenticated, user: state.user }),
+         onRehydrateStorage: () => {
+            console.log("Hydration started");
+            return (state, error) => {
+               if (error) console.log("Hydration error", error);
+               else console.log("Hydration finished", state);
+            };
+         },
       }
-   }
-}))
+   )
+);
 
 export default useAuthStore;
