@@ -1,4 +1,4 @@
-import { getCurrentUser } from '@/lib/appwrite';
+import { getCurrentUser, signOut } from '@/lib/appwrite';
 import { User } from '@/type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
@@ -14,6 +14,7 @@ type AuthStore = {
    setIsLoading: (loading: boolean) => void;
 
    fetchAuthenticatedUser: () => Promise<void>;
+   logout: () => Promise<void>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -38,6 +39,16 @@ const useAuthStore = create<AuthStore>()(
                set({ isAuthenticated: false, user: null });
             } finally {
                set({ isLoading: false });
+            }
+         },
+
+         logout: async () => {
+            try {
+               await signOut();
+               await AsyncStorage.removeItem('auth');
+               set({ isAuthenticated: false, user: null });
+            } catch (error) {
+               console.log("Sign out error", error);
             }
          }
       }),

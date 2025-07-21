@@ -32,7 +32,7 @@ const dummyData = {
       { name: "Choco Lava Cake", price: 42, type: "side" },
    ],
 
-   menu: [
+   menus: [
       {
          name: "Classic Cheeseburger",
          description: "Beef patty, cheese, lettuce, tomato",
